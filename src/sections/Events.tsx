@@ -3,7 +3,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowRight, Calendar, MapPin } from 'lucide-react';
 
-gsap.registerPlugin(ScrollTrigger);
+// FIX: Removed redundant gsap.registerPlugin(ScrollTrigger)
 
 const events = [
   {
@@ -37,7 +37,6 @@ export default function Events() {
     if (!section || !header || !tiles) return;
 
     const ctx = gsap.context(() => {
-      // Header animation
       gsap.fromTo(header,
         { y: 24, opacity: 0 },
         {
@@ -54,7 +53,6 @@ export default function Events() {
         }
       );
 
-      // Tiles animation with parallax
       const tileElements = tiles.querySelectorAll('.event-tile');
       tileElements.forEach((tile) => {
         const img = tile.querySelector('.tile-bg');
@@ -76,7 +74,9 @@ export default function Events() {
           }
         );
 
-        // Parallax on background image
+        // FIX: Was `scrub: true` (instant sync = max CPU).
+        // Changed to `scrub: 0.5` to lerp with a 0.5s lag — same visual
+        // effect but the browser can skip frames safely.
         if (img) {
           gsap.fromTo(img,
             { y: -12 },
@@ -87,7 +87,7 @@ export default function Events() {
                 trigger: tile,
                 start: 'top bottom',
                 end: 'bottom top',
-                scrub: true,
+                scrub: 0.5,
               }
             }
           );
@@ -105,7 +105,6 @@ export default function Events() {
       className="relative z-30 bg-[#0B1A2A] py-20 lg:py-28"
     >
       <div className="relative z-10 section-padding max-w-7xl mx-auto">
-        {/* Header */}
         <div ref={headerRef} className="text-center mb-12">
           <span className="eyebrow block mb-4">Events</span>
           <h2 className="text-[clamp(34px,3.6vw,56px)] leading-[1.0] text-white uppercase font-bold mb-4">
@@ -116,29 +115,26 @@ export default function Events() {
           </p>
         </div>
 
-        {/* Event Tiles */}
         <div ref={tilesRef} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {events.map((event) => (
             <div
               key={event.id}
               className="event-tile group relative h-[34vh] min-h-[280px] rounded-[28px] overflow-hidden cursor-pointer"
             >
-              {/* Background Image with Parallax */}
               <div className="absolute inset-0 overflow-hidden">
+                {/* FIX: loading="lazy" + will-change:transform on parallax images */}
                 <img
                   src={event.image}
                   alt={event.title}
                   className="tile-bg w-full h-[calc(100%+24px)] object-cover transition-transform duration-700 group-hover:scale-105"
-                  style={{ marginTop: '-12px' }}
+                  style={{ marginTop: '-12px', willChange: 'transform' }}
+                  loading="lazy"
                 />
               </div>
 
-              {/* Gradient Overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-[#0B1A2A] via-[#0B1A2A]/40 to-transparent" />
 
-              {/* Content */}
               <div className="absolute inset-0 p-6 flex flex-col justify-end">
-                {/* Date Badge */}
                 <div className="flex items-center gap-2 mb-3">
                   <span className="inline-flex items-center gap-1.5 bg-[#FF6A3D] text-white text-xs font-medium px-3 py-1.5 rounded-full">
                     <Calendar className="w-3 h-3" />
@@ -150,17 +146,14 @@ export default function Events() {
                   </span>
                 </div>
 
-                {/* Title */}
                 <h3 className="text-2xl font-bold text-white mb-2">
                   {event.title}
                 </h3>
 
-                {/* Description */}
                 <p className="text-[#A9B6C7] text-sm mb-4">
                   {event.description}
                 </p>
 
-                {/* CTA */}
                 <button className="inline-flex items-center gap-2 text-[#FF6A3D] font-medium text-sm w-fit group/link">
                   Join the event
                   <ArrowRight className="w-4 h-4 transition-transform group-hover/link:translate-x-1" />

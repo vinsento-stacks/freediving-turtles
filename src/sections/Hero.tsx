@@ -3,7 +3,8 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ChevronDown } from 'lucide-react';
 
-gsap.registerPlugin(ScrollTrigger);
+// FIX: Removed redundant gsap.registerPlugin(ScrollTrigger) — already
+// registered once in App.tsx. Re-registering in every section is wasteful.
 
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -24,16 +25,13 @@ export default function Hero() {
     if (!section || !bg || !headline || !subline || !cta || !scrollHint) return;
 
     const ctx = gsap.context(() => {
-      // Initial load animation
       const loadTl = gsap.timeline({ defaults: { ease: 'power3.out' } });
 
-      // Background fade in with scale
       loadTl.fromTo(bg,
         { opacity: 0, scale: 1.06 },
         { opacity: 1, scale: 1, duration: 1.1, ease: 'power2.out' }
       );
 
-      // Headline words animation
       const words = headline.querySelectorAll('.word');
       loadTl.fromTo(words,
         { y: 40, opacity: 0, rotateX: 18 },
@@ -41,28 +39,24 @@ export default function Hero() {
         '-=0.6'
       );
 
-      // Subline fade in
       loadTl.fromTo(subline,
         { y: 18, opacity: 0 },
         { y: 0, opacity: 1, duration: 0.6 },
         '-=0.4'
       );
 
-      // CTA buttons fade in
       loadTl.fromTo(cta,
         { y: 18, opacity: 0 },
         { y: 0, opacity: 1, duration: 0.6 },
         '-=0.3'
       );
 
-      // Scroll hint fade in
       loadTl.fromTo(scrollHint,
         { y: 12, opacity: 0 },
         { y: 0, opacity: 1, duration: 0.5 },
         '-=0.2'
       );
 
-      // Scroll-driven exit animation
       const scrollTl = gsap.timeline({
         scrollTrigger: {
           trigger: section,
@@ -71,46 +65,36 @@ export default function Hero() {
           pin: true,
           scrub: 0.6,
           onLeaveBack: () => {
-            // Reset all elements when scrolling back to top
             gsap.set([headline, subline, cta], { opacity: 1, x: 0, y: 0 });
             gsap.set(bg, { scale: 1, y: 0 });
           }
         }
       });
 
-      // Phase 1 (0%-30%): Hold - no animation
-      // Phase 2 (30%-70%): Settle - no animation
-      // Phase 3 (70%-100%): Exit
-
-      // Headline exit
       scrollTl.fromTo(headline,
         { x: 0, opacity: 1 },
         { x: '-18vw', opacity: 0, ease: 'power2.in' },
         0.70
       );
 
-      // Subline exit
       scrollTl.fromTo(subline,
         { y: 0, opacity: 1 },
         { y: '10vh', opacity: 0, ease: 'power2.in' },
         0.70
       );
 
-      // CTA exit
       scrollTl.fromTo(cta,
         { y: 0, opacity: 1 },
         { y: '10vh', opacity: 0, ease: 'power2.in' },
         0.72
       );
 
-      // Scroll hint exit
       scrollTl.fromTo(scrollHint,
         { opacity: 1 },
         { opacity: 0, ease: 'power2.in' },
         0.65
       );
 
-      // Background parallax
       scrollTl.fromTo(bg,
         { scale: 1, y: 0 },
         { scale: 1.08, y: '-6vh', ease: 'none' },
@@ -135,23 +119,25 @@ export default function Hero() {
       id="hero"
       className="pinned-section relative z-10"
     >
-      {/* Background Image */}
+      {/* Background Image — FIX: will-change:transform promotes to GPU layer,
+          preventing layout recalc during GSAP scale/translate animations.
+          fetchpriority="high" ensures it loads before other images. */}
       <div
         ref={bgRef}
         className="absolute inset-0 w-full h-full"
-        style={{ opacity: 0 }}
+        style={{ opacity: 0, willChange: 'transform' }}
       >
         <img
           src="/hero_underwater.jpg"
           alt="Underwater scene"
           className="w-full h-full object-cover"
+          fetchPriority="high"
         />
         <div className="absolute inset-0 ocean-gradient-dark" />
       </div>
 
       {/* Content */}
       <div className="relative z-10 w-full h-full flex flex-col justify-center section-padding">
-        {/* Headline */}
         <div
           ref={headlineRef}
           className="max-w-[52vw] ml-[10vw] mt-[-4vh]"
@@ -165,7 +151,6 @@ export default function Hero() {
           </h1>
         </div>
 
-        {/* Subline */}
         <div
           ref={sublineRef}
           className="max-w-[34vw] ml-[10vw] mt-8"
@@ -176,7 +161,6 @@ export default function Hero() {
           </p>
         </div>
 
-        {/* CTA Buttons */}
         <div
           ref={ctaRef}
           className="ml-[10vw] mt-8 flex items-center gap-4"
@@ -197,7 +181,6 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Scroll Hint */}
       <div
         ref={scrollHintRef}
         className="absolute bottom-[4vh] left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"

@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-gsap.registerPlugin(ScrollTrigger);
+// FIX: Removed redundant gsap.registerPlugin(ScrollTrigger)
 
 export default function Join() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -31,22 +31,18 @@ export default function Join() {
         }
       });
 
-      // Phase 1 (0%-30%): Entrance
-      // Text block from left
       scrollTl.fromTo(textBlock,
         { x: '-50vw', opacity: 0 },
         { x: 0, opacity: 1, ease: 'none' },
         0
       );
 
-      // Card from right with rotation
       scrollTl.fromTo(card,
         { x: '60vw', rotate: 6, opacity: 0 },
         { x: 0, rotate: 0, opacity: 1, ease: 'none' },
         0.05
       );
 
-      // CTA buttons fade in
       const ctas = textBlock.querySelectorAll('.cta-btn');
       scrollTl.fromTo(ctas,
         { y: 12, opacity: 0 },
@@ -54,16 +50,12 @@ export default function Join() {
         0.18
       );
 
-      // Caption fade in
       scrollTl.fromTo(caption,
         { y: 10, opacity: 0 },
         { y: 0, opacity: 1, ease: 'none' },
         0.20
       );
 
-      // Phase 2 (30%-70%): Settle - hold position
-
-      // Phase 3 (70%-100%): Exit
       scrollTl.fromTo(textBlock,
         { y: 0, opacity: 1 },
         { y: '-12vh', opacity: 0, ease: 'power2.in' },
@@ -93,19 +85,18 @@ export default function Join() {
       id="join"
       className="pinned-section relative z-20"
     >
-      {/* Background Image */}
-      <div ref={bgRef} className="absolute inset-0 w-full h-full">
+      {/* FIX: will-change:transform on background for GPU compositing */}
+      <div ref={bgRef} className="absolute inset-0 w-full h-full" style={{ willChange: 'transform' }}>
         <img
           src="/join_diver.jpg"
           alt="Freediver facing camera"
           className="w-full h-full object-cover"
+          loading="lazy"
         />
         <div className="absolute inset-0 ocean-gradient-dark" />
       </div>
 
-      {/* Content */}
       <div className="relative z-10 w-full h-full flex items-center">
-        {/* Left Text Block */}
         <div
           ref={textBlockRef}
           className="ml-[10vw] w-[40vw]"
@@ -116,7 +107,7 @@ export default function Join() {
             <span className="block">Go Deeper?</span>
           </h2>
           <p className="text-[#A9B6C7] text-base leading-relaxed mb-8 max-w-md">
-            Join the crew for weekly sessions, workshops, and trips. 
+            Join the crew for weekly sessions, workshops, and trips.
             All levels welcome— from complete beginners to competitive freedivers.
           </p>
           <div className="flex items-center gap-4">
@@ -129,7 +120,6 @@ export default function Join() {
           </div>
         </div>
 
-        {/* Right Floating Card */}
         <div
           ref={cardRef}
           className="absolute right-[10vw] top-[18vh] w-[32vw] h-[46vh] floating-card"
@@ -139,8 +129,8 @@ export default function Join() {
             src="/join_group.jpg"
             alt="Freediving community group"
             className="w-full h-full object-cover"
+            loading="lazy"
           />
-          {/* Caption inside card */}
           <div
             ref={captionRef}
             className="absolute bottom-4 left-4"

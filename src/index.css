@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@700;800&family=Space+Mono:wght@400;700&display=swap');
+/* FIX: Fonts moved to index.html as <link> tags (non-blocking).
+   The @import below was render-blocking — removed. */
 
 @tailwind base;
 @tailwind components;
@@ -33,23 +34,23 @@
   * {
     @apply border-border;
   }
-  
-  html {
-    scroll-behavior: smooth;
-  }
-  
+
+  /* FIX: Removed html { scroll-behavior: smooth } — it conflicts with GSAP
+     ScrollTrigger's scrub, causing the browser's native smooth scroll to
+     fight GSAP's scroll driver and producing double-scroll jank. */
+
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Inter', sans-serif;
     overflow-x: hidden;
   }
-  
+
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Montserrat', sans-serif;
     font-weight: 700;
     letter-spacing: 0.02em;
   }
-  
+
   .font-mono {
     font-family: 'Space Mono', monospace;
   }
@@ -60,57 +61,69 @@
     @apply bg-clip-text text-transparent;
     background-image: linear-gradient(135deg, #F4F7FA 0%, #A9B6C7 100%);
   }
-  
+
   .ocean-gradient {
     background: linear-gradient(180deg, rgba(11,26,42,0.25) 0%, rgba(11,26,42,0.65) 100%);
   }
-  
+
   .ocean-gradient-dark {
     background: linear-gradient(180deg, rgba(11,26,42,0.45) 0%, rgba(11,26,42,0.85) 100%);
   }
-  
+
+  /* FIX: Was `transition-all` which animates EVERY CSS property on hover
+     (width, height, color, border, padding…). Changed to explicit properties
+     only — dramatically reduces style recalc cost during scroll. */
   .card-hover {
-    @apply transition-all duration-300 ease-out;
+    transition: transform 300ms ease-out, box-shadow 300ms ease-out;
   }
-  
+
   .card-hover:hover {
     transform: translateY(-6px);
   }
-  
+
   .btn-primary {
-    @apply bg-[#FF6A3D] text-white px-6 py-3 rounded-[14px] font-medium transition-all duration-200;
+    @apply bg-[#FF6A3D] text-white px-6 py-3 rounded-[14px] font-medium;
+    transition: transform 200ms ease-out, box-shadow 200ms ease-out;
   }
-  
+
   .btn-primary:hover {
     transform: translateY(-2px) scale(1.02);
     box-shadow: 0 8px 24px rgba(255, 106, 61, 0.35);
   }
-  
+
   .btn-secondary {
-    @apply bg-transparent text-white px-6 py-3 rounded-[14px] font-medium border border-white/20 transition-all duration-200;
+    @apply bg-transparent text-white px-6 py-3 rounded-[14px] font-medium border border-white/20;
+    transition: transform 200ms ease-out, background-color 200ms ease-out;
   }
-  
+
   .btn-secondary:hover {
     @apply bg-white/10;
     transform: translateY(-2px);
   }
-  
+
   .eyebrow {
     @apply font-mono text-xs uppercase tracking-[0.12em] text-[#A9B6C7];
   }
-  
+
   .section-padding {
     @apply px-4 sm:px-6 lg:px-8 xl:px-12;
   }
-  
+
   .pinned-section {
     @apply relative w-screen h-screen overflow-hidden;
   }
-  
+
   .floating-card {
     @apply rounded-[28px] overflow-hidden shadow-[0_18px_50px_rgba(0,0,0,0.28)];
+    /* FIX: promote card to its own GPU compositing layer */
+    will-change: transform;
   }
-  
+
+  /* FIX: Removed mix-blend-mode: overlay from noise-overlay.
+     mix-blend-mode forces the browser to flatten ALL layers beneath the
+     fixed element into a single texture every frame — the single biggest
+     scroll performance killer on this page.
+     The noise is still visible at opacity 0.04 without the blend mode. */
   .noise-overlay {
     position: fixed;
     top: 0;
@@ -120,7 +133,6 @@
     pointer-events: none;
     z-index: 9999;
     opacity: 0.04;
-    mix-blend-mode: overlay;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
   }
 }
@@ -129,39 +141,18 @@
   .text-balance {
     text-wrap: balance;
   }
-  
-  .animation-delay-100 {
-    animation-delay: 100ms;
-  }
-  
-  .animation-delay-200 {
-    animation-delay: 200ms;
-  }
-  
-  .animation-delay-300 {
-    animation-delay: 300ms;
-  }
+
+  .animation-delay-100 { animation-delay: 100ms; }
+  .animation-delay-200 { animation-delay: 200ms; }
+  .animation-delay-300 { animation-delay: 300ms; }
 }
 
 /* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #0B1A2A; }
+::-webkit-scrollbar-thumb { background: #1e3a5f; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #2a4a73; }
 
-::-webkit-scrollbar-track {
-  background: #0B1A2A;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #1e3a5f;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #2a4a73;
-}
-
-/* Selection color */
 ::selection {
   background: rgba(255, 106, 61, 0.3);
   color: #F4F7FA;

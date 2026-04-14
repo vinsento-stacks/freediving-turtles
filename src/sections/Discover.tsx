@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-gsap.registerPlugin(ScrollTrigger);
+// FIX: Removed redundant gsap.registerPlugin(ScrollTrigger)
 
 export default function Discover() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -31,15 +31,12 @@ export default function Discover() {
         }
       });
 
-      // Phase 1 (0%-30%): Entrance
-      // Text block from left
       scrollTl.fromTo(textBlock,
         { x: '-50vw', opacity: 0 },
         { x: 0, opacity: 1, ease: 'none' },
         0
       );
 
-      // Headline words stagger
       const words = textBlock.querySelectorAll('.word');
       scrollTl.fromTo(words,
         { y: 24, opacity: 0 },
@@ -47,23 +44,18 @@ export default function Discover() {
         0.08
       );
 
-      // Card from right with rotation
       scrollTl.fromTo(card,
         { x: '60vw', rotate: 6, opacity: 0 },
         { x: 0, rotate: 0, opacity: 1, ease: 'none' },
         0.05
       );
 
-      // Caption fade in
       scrollTl.fromTo(caption,
         { y: 10, opacity: 0 },
         { y: 0, opacity: 1, ease: 'none' },
         0.18
       );
 
-      // Phase 2 (30%-70%): Settle - hold position
-
-      // Phase 3 (70%-100%): Exit
       scrollTl.fromTo(textBlock,
         { x: 0, opacity: 1 },
         { x: '-18vw', opacity: 0, ease: 'power2.in' },
@@ -93,19 +85,19 @@ export default function Discover() {
       id="discover"
       className="pinned-section relative z-20"
     >
-      {/* Background Image */}
-      <div ref={bgRef} className="absolute inset-0 w-full h-full">
+      {/* FIX: will-change:transform on bg wrapper for GPU compositing */}
+      <div ref={bgRef} className="absolute inset-0 w-full h-full" style={{ willChange: 'transform' }}>
+        {/* FIX: loading="lazy" — below the fold on load */}
         <img
           src="/discover_background.jpg"
           alt="Underwater light rays"
           className="w-full h-full object-cover"
+          loading="lazy"
         />
         <div className="absolute inset-0 ocean-gradient-dark" />
       </div>
 
-      {/* Content */}
       <div className="relative z-10 w-full h-full flex items-center">
-        {/* Left Text Block */}
         <div
           ref={textBlockRef}
           className="ml-[10vw] w-[40vw]"
@@ -121,8 +113,8 @@ export default function Discover() {
             <span className="word inline-block">Everything</span>
           </h2>
           <p className="text-[#A9B6C7] text-base leading-relaxed mb-8 max-w-md">
-            Freediving is not about pushing limits—it's about learning to be comfortable 
-            in the unknown. We teach technique, safety, and calm so you can explore 
+            Freediving is not about pushing limits—it's about learning to be comfortable
+            in the unknown. We teach technique, safety, and calm so you can explore
             deeper with confidence.
           </p>
           <button className="btn-secondary">
@@ -130,7 +122,6 @@ export default function Discover() {
           </button>
         </div>
 
-        {/* Right Floating Card */}
         <div
           ref={cardRef}
           className="absolute right-[10vw] top-[18vh] w-[32vw] h-[46vh] floating-card"
@@ -140,8 +131,8 @@ export default function Discover() {
             src="/discover_pool.jpg"
             alt="Pool training session"
             className="w-full h-full object-cover"
+            loading="lazy"
           />
-          {/* Caption inside card */}
           <div
             ref={captionRef}
             className="absolute bottom-4 left-4"

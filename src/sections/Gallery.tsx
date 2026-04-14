@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-gsap.registerPlugin(ScrollTrigger);
+// FIX: Removed redundant gsap.registerPlugin(ScrollTrigger)
 
 export default function Gallery() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -31,15 +31,12 @@ export default function Gallery() {
         }
       });
 
-      // Phase 1 (0%-30%): Entrance
-      // Headline from top
       scrollTl.fromTo(headline,
         { y: '-40vh', opacity: 0, scale: 0.96 },
         { y: 0, opacity: 1, scale: 1, ease: 'none' },
         0
       );
 
-      // Headline words stagger
       const words = headline.querySelectorAll('.word');
       scrollTl.fromTo(words,
         { y: 18, opacity: 0 },
@@ -47,23 +44,18 @@ export default function Gallery() {
         0.10
       );
 
-      // Card from right with rotation
       scrollTl.fromTo(card,
         { x: '60vw', rotate: 8, opacity: 0 },
         { x: 0, rotate: 0, opacity: 1, ease: 'none' },
         0.08
       );
 
-      // Caption fade in
       scrollTl.fromTo(caption,
         { y: 10, opacity: 0 },
         { y: 0, opacity: 1, ease: 'none' },
         0.20
       );
 
-      // Phase 2 (30%-70%): Settle - hold position
-
-      // Phase 3 (70%-100%): Exit
       scrollTl.fromTo(headline,
         { y: 0, opacity: 1 },
         { y: '-18vh', opacity: 0, ease: 'power2.in' },
@@ -93,19 +85,18 @@ export default function Gallery() {
       id="gallery"
       className="pinned-section relative z-20"
     >
-      {/* Background Image */}
-      <div ref={bgRef} className="absolute inset-0 w-full h-full">
+      {/* FIX: will-change:transform on background for GPU compositing */}
+      <div ref={bgRef} className="absolute inset-0 w-full h-full" style={{ willChange: 'transform' }}>
         <img
           src="/gallery_group.jpg"
           alt="Freediving community"
           className="w-full h-full object-cover"
+          loading="lazy"
         />
         <div className="absolute inset-0 ocean-gradient-dark" />
       </div>
 
-      {/* Content */}
       <div className="relative z-10 w-full h-full flex flex-col items-center justify-start pt-[18vh]">
-        {/* Headline */}
         <div
           ref={headlineRef}
           className="text-center"
@@ -121,7 +112,6 @@ export default function Gallery() {
           </h2>
         </div>
 
-        {/* Floating Card */}
         <div
           ref={cardRef}
           className="absolute right-[8vw] bottom-[12vh] w-[30vw] h-[34vh] min-w-[280px] min-h-[240px] floating-card"
@@ -131,8 +121,8 @@ export default function Gallery() {
             src="/gallery_training.jpg"
             alt="Training moment"
             className="w-full h-full object-cover"
+            loading="lazy"
           />
-          {/* Caption inside card */}
           <div
             ref={captionRef}
             className="absolute bottom-4 left-4"
